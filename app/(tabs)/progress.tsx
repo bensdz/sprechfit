@@ -1,15 +1,26 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+} from 'react-native';
 import Colors from '@/constants/Colors';
 import Fonts from '@/constants/Fonts';
-import { Calendar, ChartBar as BarChart3, SquareCheck as CheckSquare } from 'lucide-react-native';
+import {
+  Calendar,
+  ChartBar as BarChart3,
+  SquareCheck as CheckSquare,
+} from 'lucide-react-native';
 import LevelBadge from '@/components/ui/LevelBadge';
 import ProgressChart from '@/components/progress/ProgressChart';
 import PracticeHistoryItem from '@/components/progress/PracticeHistoryItem';
 
 export default function ProgressScreen() {
   const [activeTab, setActiveTab] = useState('stats');
-  
+
   const stats = {
     totalPractices: 32,
     totalMinutes: 84,
@@ -23,7 +34,7 @@ export default function ProgressScreen() {
       { word: 'receive', count: 4 },
     ],
   };
-  
+
   const practiceHistory = [
     {
       id: '1',
@@ -58,7 +69,7 @@ export default function ProgressScreen() {
       level: 'B1',
     },
   ];
-  
+
   const achievements = [
     {
       id: '1',
@@ -93,41 +104,48 @@ export default function ProgressScreen() {
   ];
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.header}>
         <Text style={styles.title}>Your Progress</Text>
-        
-        <View style={styles.tabs}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'stats' && styles.activeTab]}
-            onPress={() => setActiveTab('stats')}
-          >
-            <BarChart3 size={20} color={activeTab === 'stats' ? Colors.primary.main : Colors.grey[500]} />
-            <Text style={[styles.tabText, activeTab === 'stats' && styles.activeTabText]}>Statistics</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'history' && styles.activeTab]}
-            onPress={() => setActiveTab('history')}
-          >
-            <Calendar size={20} color={activeTab === 'history' ? Colors.primary.main : Colors.grey[500]} />
-            <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>History</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'achievements' && styles.activeTab]}
-            onPress={() => setActiveTab('achievements')}
-          >
-            <CheckSquare size={20} color={activeTab === 'achievements' ? Colors.primary.main : Colors.grey[500]} />
-            <Text style={[styles.tabText, activeTab === 'achievements' && styles.activeTabText]}>Achievements</Text>
-          </TouchableOpacity>
-        </View>
+
+        <FlatList
+          data={[
+            { id: 'stats', label: 'Statistics', icon: BarChart3 },
+            { id: 'history', label: 'History', icon: Calendar },
+            { id: 'achievements', label: 'Achievements', icon: CheckSquare },
+          ]}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.tabs}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[styles.tab, activeTab === item.id && styles.activeTab]}
+              onPress={() => setActiveTab(item.id)}
+            >
+              <item.icon
+                size={20}
+                color={
+                  activeTab === item.id ? Colors.primary.main : Colors.grey[500]
+                }
+              />
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === item.id && styles.activeTabText,
+                ]}
+              >
+                {item.label}
+              </Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
+        />
       </View>
-      
+
       <View style={styles.content}>
         {activeTab === 'stats' && (
           <View style={styles.statsContainer}>
@@ -145,12 +163,12 @@ export default function ProgressScreen() {
                 <Text style={styles.summaryLabel}>Avg. Score</Text>
               </View>
             </View>
-            
+
             <View style={styles.chartSection}>
               <Text style={styles.sectionTitle}>Speaking Progress</Text>
               <ProgressChart />
             </View>
-            
+
             <View style={styles.mistakesSection}>
               <Text style={styles.sectionTitle}>Common Mistakes</Text>
               {stats.commonMistakes.map((mistake, index) => (
@@ -162,7 +180,7 @@ export default function ProgressScreen() {
             </View>
           </View>
         )}
-        
+
         {activeTab === 'history' && (
           <View style={styles.historyContainer}>
             {practiceHistory.map((practice) => (
@@ -170,7 +188,7 @@ export default function ProgressScreen() {
             ))}
           </View>
         )}
-        
+
         {activeTab === 'achievements' && (
           <View style={styles.achievementsContainer}>
             {achievements.map((achievement) => (
@@ -178,8 +196,12 @@ export default function ProgressScreen() {
                 <View style={styles.achievementHeader}>
                   <Text style={styles.achievementIcon}>{achievement.icon}</Text>
                   <View style={styles.achievementDetails}>
-                    <Text style={styles.achievementTitle}>{achievement.title}</Text>
-                    <Text style={styles.achievementDesc}>{achievement.description}</Text>
+                    <Text style={styles.achievementTitle}>
+                      {achievement.title}
+                    </Text>
+                    <Text style={styles.achievementDesc}>
+                      {achievement.description}
+                    </Text>
                   </View>
                   {achievement.isCompleted ? (
                     <View style={styles.completedBadge}>
@@ -191,14 +213,18 @@ export default function ProgressScreen() {
                     </View>
                   )}
                 </View>
-                
+
                 {!achievement.isCompleted && achievement.progress && (
                   <View style={styles.progressBar}>
-                    <View 
+                    <View
                       style={[
-                        styles.progressFill, 
-                        { width: `${(achievement.progress / achievement.total) * 100}%` }
-                      ]} 
+                        styles.progressFill,
+                        {
+                          width: `${
+                            (achievement.progress / achievement.total) * 100
+                          }%`,
+                        },
+                      ]}
                     />
                     <Text style={styles.progressText}>
                       {achievement.progress}/{achievement.total}
@@ -228,7 +254,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.default,
   },
   title: {
-    ...Fonts.heading,
+    fontFamily: Fonts.heading.fontFamily,
+    fontWeight: '600',
     fontSize: Fonts.sizes.xxxl,
     color: Colors.text.primary,
     marginBottom: 20,
@@ -236,6 +263,7 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
     marginBottom: 20,
+    marginRight: -20, // To offset the last item's right margin
   },
   tab: {
     flexDirection: 'row',
@@ -249,14 +277,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary.light,
   },
   tabText: {
-    ...Fonts.body,
+    fontFamily: Fonts.body.fontFamily,
+    fontWeight: '400',
     fontSize: Fonts.sizes.small,
     color: Colors.grey[600],
     marginLeft: 8,
   },
   activeTabText: {
     color: Colors.primary.main,
-    ...Fonts.bodyBold,
+    fontFamily: Fonts.bodyBold.fontFamily,
+    fontWeight: '600',
   },
   content: {
     padding: 20,
@@ -284,12 +314,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   summaryValue: {
-    ...Fonts.heading,
+    fontFamily: Fonts.heading.fontFamily,
+    fontWeight: '600',
     fontSize: Fonts.sizes.xxl,
     color: Colors.primary.main,
   },
   summaryLabel: {
-    ...Fonts.body,
+    fontFamily: Fonts.body.fontFamily,
+    fontWeight: '400',
     fontSize: Fonts.sizes.small,
     color: Colors.text.secondary,
   },
@@ -300,7 +332,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    ...Fonts.subheading,
+    fontFamily: Fonts.subheading.fontFamily,
+    fontWeight: '600',
     fontSize: Fonts.sizes.medium,
     color: Colors.text.primary,
     marginBottom: 16,
@@ -318,12 +351,14 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.grey[200],
   },
   mistakeWord: {
-    ...Fonts.bodyBold,
+    fontFamily: Fonts.bodyBold.fontFamily,
+    fontWeight: '600',
     fontSize: Fonts.sizes.medium,
     color: Colors.text.primary,
   },
   mistakeCount: {
-    ...Fonts.body,
+    fontFamily: Fonts.body.fontFamily,
+    fontWeight: '400',
     fontSize: Fonts.sizes.small,
     color: Colors.error.main,
   },
@@ -353,12 +388,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   achievementTitle: {
-    ...Fonts.subheading,
+    fontFamily: Fonts.subheading.fontFamily,
+    fontWeight: '600',
     fontSize: Fonts.sizes.medium,
     color: Colors.text.primary,
   },
   achievementDesc: {
-    ...Fonts.body,
+    fontFamily: Fonts.body.fontFamily,
+    fontWeight: '400',
     fontSize: Fonts.sizes.small,
     color: Colors.text.secondary,
   },
@@ -369,7 +406,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   completedText: {
-    ...Fonts.bodyBold,
+    fontFamily: Fonts.bodyBold.fontFamily,
+    fontWeight: '600',
     fontSize: Fonts.sizes.xs,
     color: Colors.success.dark,
   },
@@ -380,7 +418,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   pendingText: {
-    ...Fonts.body,
+    fontFamily: Fonts.body.fontFamily,
+    fontWeight: '400',
     fontSize: Fonts.sizes.xs,
     color: Colors.grey[600],
   },
@@ -401,7 +440,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   progressText: {
-    ...Fonts.body,
+    fontFamily: Fonts.body.fontFamily,
+    fontWeight: '400',
     fontSize: Fonts.sizes.xs,
     color: Colors.text.secondary,
     textAlign: 'center',

@@ -10,7 +10,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import Colors from '@/constants/Colors';
 import Fonts from '@/constants/Fonts';
-import { Mic, Play, Pause, RefreshCw } from 'lucide-react-native';
+import { Mic } from 'lucide-react-native';
 import TopicCard from '@/components/practice/TopicCard';
 import RecordingModal from '@/components/practice/RecordingModal';
 import LevelBadge from '@/components/ui/LevelBadge';
@@ -23,7 +23,7 @@ export default function PracticeScreen() {
   const [userLevel, setUserLevel] = useState<string>('B1');
   const [selectedTime, setSelectedTime] = useState<number>(60);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [streakCount, setStreakCount] = useState<number>(3);
+  const [streakCount] = useState<number>(3); // setStreakCount was unused
 
   useEffect(() => {
     const loadUserLevel = async () => {
@@ -130,6 +130,8 @@ export default function PracticeScreen() {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         topic={currentTopic?.textDe || ''}
+        // grammarFocus={currentTopic.grammarFocus || []}
+        // keyVocabulary={currentTopic.keyVocabulary || []}
         durationSeconds={selectedTime}
       />
     </ScrollView>
@@ -155,6 +157,7 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     ...Fonts.heading,
+    fontWeight: 'bold', // Ensure fontWeight is a valid TextStyle value
     fontSize: Fonts.sizes.xxxl,
     color: Colors.primary.contrast,
     marginBottom: 10,
@@ -162,15 +165,13 @@ const styles = StyleSheet.create({
   levelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
   },
   levelText: {
     fontSize: Fonts.sizes.medium,
     color: Colors.primary.contrast,
-  } as TextStyle,
+  },
   streakContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -178,6 +179,7 @@ const styles = StyleSheet.create({
   },
   streakText: {
     ...Fonts.bodyBold,
+    fontWeight: 'bold',
     fontSize: Fonts.sizes.small,
     color: Colors.primary.contrast,
   },
@@ -186,6 +188,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...Fonts.subheading,
+    fontWeight: 'bold',
     fontSize: Fonts.sizes.large,
     color: Colors.text.primary,
     marginBottom: 16,
@@ -214,12 +217,14 @@ const styles = StyleSheet.create({
   },
   timeOptionText: {
     ...Fonts.body,
+    fontWeight: 'normal',
     fontSize: Fonts.sizes.medium,
     color: Colors.text.primary,
   },
   timeOptionTextSelected: {
-    color: Colors.primary.dark,
     ...Fonts.bodyBold,
+    fontWeight: 'bold',
+    color: Colors.primary.dark,
   },
   startButton: {
     backgroundColor: Colors.primary.main,
@@ -234,31 +239,32 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   startButtonText: {
     ...Fonts.bodyBold,
+    fontWeight: 'bold',
     fontSize: Fonts.sizes.large,
     color: Colors.primary.contrast,
     marginLeft: 8,
   },
   tipContainer: {
+    marginLeft: 8,
     backgroundColor: Colors.background.paper,
     padding: 16,
     borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.secondary.main,
+    borderWidth: 1,
+    borderColor: Colors.grey[200],
   },
   tipTitle: {
     ...Fonts.bodyBold,
+    fontWeight: 'bold',
     fontSize: Fonts.sizes.medium,
     color: Colors.text.primary,
     marginBottom: 8,
   },
   tipText: {
     ...Fonts.body,
+    fontWeight: 'normal',
     fontSize: Fonts.sizes.small,
     color: Colors.text.secondary,
     lineHeight: 20,

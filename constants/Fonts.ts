@@ -1,19 +1,23 @@
 export default {
   heading: {
-    fontFamily: 'Outfit-Bold',
-    fontWeight: '700',
+    // Updated to Montserrat
+    fontFamily: 'Montserrat-Bold', // Assuming you have Montserrat-Bold.ttf/otf
+    fontWeight: 700, // Keep numeric weight for potential fallback/web
   },
   subheading: {
-    fontFamily: 'Outfit-Medium',
-    fontWeight: '500',
+    // Updated to Montserrat
+    fontFamily: 'Montserrat-SemiBold', // Assuming you have Montserrat-SemiBold.ttf/otf
+    fontWeight: 600,
   },
   body: {
-    fontFamily: 'Inter-Regular',
-    fontWeight: '400',
+    // Updated to Montserrat
+    fontFamily: 'Montserrat-Regular', // Assuming you have Montserrat-Regular.ttf/otf
+    fontWeight: 400,
   },
   bodyBold: {
-    fontFamily: 'Inter-SemiBold',
-    fontWeight: '600',
+    // Updated to Montserrat
+    fontFamily: 'Montserrat-SemiBold', // Using SemiBold for bold body text
+    fontWeight: 600,
   },
   sizes: {
     xs: 12,
@@ -26,7 +30,7 @@ export default {
     display: 40,
   },
   lineHeights: {
-    body: 1.5,    // 150%
-    heading: 1.2,  // 120%
-  }
+    body: 1.5, // 150%
+    heading: 1.2, // 120%
+  },
 };

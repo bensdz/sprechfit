@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Modal, TouchableOpacity, Alert, Platform } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  TouchableOpacity,
+  Alert,
+  Platform,
+} from 'react-native';
 import Colors from '@/constants/Colors';
 import Fonts from '@/constants/Fonts';
 import { Mic, MicOff, X, Play, Pause } from 'lucide-react-native';
@@ -10,22 +18,32 @@ type RecordingModalProps = {
   visible: boolean;
   onClose: () => void;
   topic: string;
+  grammarFocus: string[];
+  keyVocabulary: string[];
   durationSeconds: number;
 };
 
-export default function RecordingModal({ visible, onClose, topic, durationSeconds }: RecordingModalProps) {
+export default function RecordingModal({
+  visible,
+  onClose,
+  topic,
+  grammarFocus,
+  keyVocabulary,
+  durationSeconds,
+}: RecordingModalProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingUri, setRecordingUri] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState(durationSeconds);
-  const [recordingPermission, setRecordingPermission] = useState<boolean>(false);
+  const [recordingPermission, setRecordingPermission] =
+    useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [score, setScore] = useState<number | null>(null);
-  
+
   const recording = useRef<Audio.Recording | null>(null);
   const sound = useRef<Audio.Sound | null>(null);
   const timer = useRef<NodeJS.Timeout | null>(null);
-  
+
   useEffect(() => {
     if (visible) {
       // Reset state when modal opens
@@ -34,27 +52,27 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
       setRemainingSeconds(durationSeconds);
       setFeedback(null);
       setScore(null);
-      
+
       // Check permissions
       checkPermission();
     }
-    
+
     return () => {
       // Cleanup on unmount
       stopRecording();
       stopPlayback();
-      
+
       if (timer.current) {
         clearInterval(timer.current);
       }
     };
   }, [visible, durationSeconds]);
-  
+
   const checkPermission = async () => {
     try {
       const { status } = await Audio.requestPermissionsAsync();
       setRecordingPermission(status === 'granted');
-      
+
       if (status !== 'granted') {
         if (Platform.OS !== 'web') {
           Alert.alert(
@@ -70,7 +88,7 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
       console.log('Error requesting permissions:', error);
     }
   };
-  
+
   const startRecording = async () => {
     try {
       // Configure audio
@@ -78,15 +96,15 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      
+
       // Start recording
       const { recording: rec } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
-      
+
       recording.current = rec;
       setIsRecording(true);
-      
+
       // Start timer
       startTimer();
     } catch (error) {
@@ -96,41 +114,41 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
       }
     }
   };
-  
+
   const stopRecording = async () => {
     if (!recording.current) return;
-    
+
     try {
       setIsRecording(false);
-      
+
       // Stop timer
       if (timer.current) {
         clearInterval(timer.current);
         timer.current = null;
       }
-      
+
       await recording.current.stopAndUnloadAsync();
       const uri = recording.current.getURI();
-      
+
       // Reset audio mode
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
       });
-      
+
       if (uri) {
         setRecordingUri(uri);
         generateFeedback();
       }
-      
+
       recording.current = null;
     } catch (error) {
       console.log('Error stopping recording:', error);
     }
   };
-  
+
   const startTimer = () => {
     setRemainingSeconds(durationSeconds);
-    
+
     timer.current = setInterval(() => {
       setRemainingSeconds((prev) => {
         if (prev <= 1) {
@@ -145,23 +163,23 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
       });
     }, 1000);
   };
-  
+
   const playRecording = async () => {
     if (!recordingUri) return;
-    
+
     try {
       // Stop any existing playback
       await stopPlayback();
-      
+
       // Load and play the recording
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: recordingUri },
         { shouldPlay: true }
       );
-      
+
       sound.current = newSound;
       setIsPlaying(true);
-      
+
       // When playback finishes
       sound.current.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
@@ -172,10 +190,10 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
       console.log('Error playing recording:', error);
     }
   };
-  
+
   const stopPlayback = async () => {
     if (!sound.current) return;
-    
+
     try {
       await sound.current.stopAsync();
       await sound.current.unloadAsync();
@@ -185,39 +203,39 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
       console.log('Error stopping playback:', error);
     }
   };
-  
+
   const generateFeedback = () => {
     // In a real app, this would analyze the speech recording
     // For demo purposes, we'll simulate feedback
-    
+
     // Simulated score between 65-95
     const randomScore = Math.floor(Math.random() * 31) + 65;
     setScore(randomScore);
-    
+
     // Sample feedback points
     const feedbackPoints = [
       'Good use of vocabulary related to the topic.',
       'Try to use more complex sentence structures.',
       'Watch out for pronunciation of "-ed" endings.',
       'Good pace and fluency in your speech.',
-      'Consider using more connecting words for smoother transitions.'
+      'Consider using more connecting words for smoother transitions.',
     ];
-    
+
     // Choose 3 random feedback points
     const selectedFeedback = [];
     const indices = new Set();
-    
+
     while (indices.size < 3) {
       indices.add(Math.floor(Math.random() * feedbackPoints.length));
     }
-    
-    indices.forEach(index => {
+
+    indices.forEach((index) => {
       selectedFeedback.push(feedbackPoints[index]);
     });
-    
+
     setFeedback(selectedFeedback.join('\n\n'));
   };
-  
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -239,33 +257,42 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
               <X size={24} color={Colors.grey[600]} />
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.topicContainer}>
             <Text style={styles.topicLabel}>Your Topic</Text>
             <Text style={styles.topicText}>{topic}</Text>
           </View>
-          
+
+          {/* <View style={styles.topicContainer}>
+            <Text style={styles.topicLabel}>Focus on</Text>
+            <Text style={styles.topicText}>{grammarFocus?.join(', ')}</Text>
+            <Text style={styles.topicLabel}>Key Vocabulary</Text>
+            <Text style={styles.topicText}>{keyVocabulary?.join(', ')}</Text>
+          </View> */}
+
           {recordingUri ? (
             <View style={styles.feedbackContainer}>
               <View style={styles.scoreContainer}>
                 <Text style={styles.scoreLabel}>Your Score</Text>
                 <Text style={styles.scoreValue}>{score}%</Text>
                 <View style={styles.scoreBar}>
-                  <View 
+                  <View
                     style={[
-                      styles.scoreBarFill, 
+                      styles.scoreBarFill,
                       { width: `${score}%` },
-                      score && score < 70 ? styles.scoreBarLow : 
-                      score && score < 85 ? styles.scoreBarMedium : 
-                      styles.scoreBarHigh
-                    ]} 
+                      score && score < 70
+                        ? styles.scoreBarLow
+                        : score && score < 85
+                        ? styles.scoreBarMedium
+                        : styles.scoreBarHigh,
+                    ]}
                   />
                 </View>
               </View>
-              
+
               <Text style={styles.feedbackTitle}>Feedback</Text>
               <Text style={styles.feedbackText}>{feedback}</Text>
-              
+
               <View style={styles.playbackControls}>
                 <TouchableOpacity
                   style={styles.playButton}
@@ -285,22 +312,26 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
           ) : (
             <>
               <View style={styles.timerContainer}>
-                <Text style={styles.timerText}>{formatTime(remainingSeconds)}</Text>
+                <Text style={styles.timerText}>
+                  {formatTime(remainingSeconds)}
+                </Text>
                 <View style={styles.timerBar}>
-                  <View 
+                  <View
                     style={[
-                      styles.timerBarFill, 
-                      { width: `${(remainingSeconds / durationSeconds) * 100}%` }
-                    ]} 
+                      styles.timerBarFill,
+                      {
+                        width: `${(remainingSeconds / durationSeconds) * 100}%`,
+                      },
+                    ]}
                   />
                 </View>
               </View>
-              
+
               {recordingPermission ? (
                 <TouchableOpacity
                   style={[
                     styles.recordButton,
-                    isRecording && styles.recordingButton
+                    isRecording && styles.recordingButton,
                   ]}
                   onPress={isRecording ? stopRecording : startRecording}
                 >
@@ -328,9 +359,9 @@ export default function RecordingModal({ visible, onClose, topic, durationSecond
                   </TouchableOpacity>
                 </View>
               )}
-              
+
               <Text style={styles.instructionText}>
-                {isRecording 
+                {isRecording
                   ? 'Speak clearly and at a natural pace.'
                   : 'Press the button to start recording. Try to speak for the entire duration.'}
               </Text>
@@ -387,6 +418,7 @@ const styles = StyleSheet.create({
     ...Fonts.body,
     fontSize: Fonts.sizes.large,
     color: Colors.text.primary,
+    fontWeight: 'bold',
     lineHeight: 28,
   },
   timerContainer: {

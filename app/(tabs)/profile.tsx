@@ -1,23 +1,42 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Switch, Alert, Platform, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Switch,
+  Alert,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import Colors from '@/constants/Colors';
 import Fonts from '@/constants/Fonts';
-import { ChevronRight, Star, Bell, User, Settings, Globe, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
+import {
+  ChevronRight,
+  Star,
+  Bell,
+  User,
+  Settings,
+  Globe,
+  CircleHelp as HelpCircle,
+  LogOut,
+} from 'lucide-react-native';
 import LevelBadge from '@/components/ui/LevelBadge';
 import { saveUserLevel } from '@/utils/userPreferences';
+import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const [userLevel, setUserLevel] = useState('B1');
   const [isPremium, setIsPremium] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  
+
   const levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-  
+
   const handleLevelChange = async (level: string) => {
     setUserLevel(level);
     await saveUserLevel(level);
   };
-  
+
   const handleUpgrade = () => {
     if (Platform.OS !== 'web') {
       Alert.alert(
@@ -25,7 +44,10 @@ export default function ProfileScreen() {
         'Access all premium features for $3.99/month or $29.99/year.',
         [
           { text: 'Not Now', style: 'cancel' },
-          { text: 'Subscribe', onPress: () => console.log('User would subscribe') },
+          {
+            text: 'Subscribe',
+            onPress: () => console.log('User would subscribe'),
+          },
         ]
       );
     } else {
@@ -34,7 +56,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView 
+    <ScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
       showsVerticalScrollIndicator={false}
@@ -42,7 +64,7 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>Profile</Text>
       </View>
-      
+
       <View style={styles.profileCard}>
         <View style={styles.profileHeader}>
           <View style={styles.avatar}>
@@ -53,8 +75,8 @@ export default function ProfileScreen() {
             <Text style={styles.profileEmail}>john.smith@example.com</Text>
           </View>
         </View>
-        
-        <View style={styles.premiumBanner}>
+
+        {/* <View style={styles.premiumBanner}>
           <View style={styles.premiumInfo}>
             <Text style={styles.premiumTitle}>
               {isPremium ? 'You are a Premium Member' : 'Upgrade to Premium'}
@@ -65,7 +87,7 @@ export default function ProfileScreen() {
                 : 'Unlock advanced topics, detailed analysis, and more'}
             </Text>
           </View>
-          
+
           {!isPremium && (
             <TouchableOpacity
               style={styles.upgradeButton}
@@ -75,12 +97,12 @@ export default function ProfileScreen() {
               <Text style={styles.upgradeButtonText}>Upgrade</Text>
             </TouchableOpacity>
           )}
-        </View>
+        </View> */}
       </View>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Language Settings</Text>
-        
+
         <View style={styles.levelSelection}>
           <Text style={styles.levelLabel}>Your Current Level:</Text>
           <View style={styles.levelOptions}>
@@ -106,13 +128,17 @@ export default function ProfileScreen() {
           </View>
         </View>
       </View>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>App Settings</Text>
-        
+
         <View style={styles.settingItem}>
           <View style={styles.settingInfo}>
-            <Bell size={20} color={Colors.text.primary} style={styles.settingIcon} />
+            <Bell
+              size={20}
+              color={Colors.text.primary}
+              style={styles.settingIcon}
+            />
             <Text style={styles.settingLabel}>Daily Reminders</Text>
           </View>
           <Switch
@@ -122,10 +148,14 @@ export default function ProfileScreen() {
             thumbColor={Colors.common.white}
           />
         </View>
-        
+
         <TouchableOpacity style={styles.settingItem}>
           <View style={styles.settingInfo}>
-            <Globe size={20} color={Colors.text.primary} style={styles.settingIcon} />
+            <Globe
+              size={20}
+              color={Colors.text.primary}
+              style={styles.settingIcon}
+            />
             <Text style={styles.settingLabel}>App Language</Text>
           </View>
           <View style={styles.settingAction}>
@@ -134,34 +164,59 @@ export default function ProfileScreen() {
           </View>
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Support</Text>
-        
+
         <TouchableOpacity style={styles.settingItem}>
           <View style={styles.settingInfo}>
-            <HelpCircle size={20} color={Colors.text.primary} style={styles.settingIcon} />
+            <HelpCircle
+              size={20}
+              color={Colors.text.primary}
+              style={styles.settingIcon}
+            />
             <Text style={styles.settingLabel}>Help & FAQ</Text>
           </View>
           <ChevronRight size={20} color={Colors.grey[500]} />
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.settingItem}>
           <View style={styles.settingInfo}>
-            <Settings size={20} color={Colors.text.primary} style={styles.settingIcon} />
+            <Settings
+              size={20}
+              color={Colors.text.primary}
+              style={styles.settingIcon}
+            />
             <Text style={styles.settingLabel}>Feedback</Text>
           </View>
           <ChevronRight size={20} color={Colors.grey[500]} />
         </TouchableOpacity>
-        
-        <TouchableOpacity style={[styles.settingItem, styles.logoutItem]}>
+
+        <TouchableOpacity
+          style={[styles.settingItem, styles.logoutItem]}
+          onPress={() =>
+            Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+              { text: 'Cancel', style: 'cancel' },
+              {
+                text: 'Sign Out',
+                onPress: () => router.replace('/home'),
+              },
+            ])
+          }
+        >
           <View style={styles.settingInfo}>
-            <LogOut size={20} color={Colors.error.main} style={styles.settingIcon} />
-            <Text style={[styles.settingLabel, styles.logoutText]}>Sign Out</Text>
+            <LogOut
+              size={20}
+              color={Colors.error.main}
+              style={styles.settingIcon}
+            />
+            <Text style={[styles.settingLabel, styles.logoutText]}>
+              Sign Out
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.footer}>
         <Text style={styles.footerText}>SprechFit v1.0.0</Text>
         <Text style={styles.footerText}>
@@ -241,7 +296,7 @@ const styles = StyleSheet.create({
   premiumBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.secondary.light,
+    backgroundColor: Colors.primary.light,
     borderRadius: 12,
     padding: 16,
   },
@@ -262,7 +317,7 @@ const styles = StyleSheet.create({
   upgradeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.warning.main,
+    backgroundColor: Colors.warning.light,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
